@@ -1,5 +1,5 @@
 galaxy_info:
-  rolename: wordpress
+  role_name: wordpress
   author: gloom39
   description: It will install wordpress in Ubuntu
     #company: your company (optional)

@@ -11,37 +11,46 @@ Requirements
 
 Role Variables
 --------------
-DB_PASSWORD: <wordpress database password>
+DB_PASSWORD: "wordpress database password"
+
 MYSQL_SOCKET_PATH: /var/run/mysqld/mysqld.sock
-DB_NAME: <wordpress database name>
-DB_USER: <wordpress database username>
-APACHE_USER: <apache user other than www-data>
-APACHE_GROUP: <apache group other than www-data>
-WP_ADMIN: <wordpress admin user>
-WP_PASSWORD: <worpress admin password>
-WP_TITLE: <wordpress blog title>
-WP_EMAIL: <wordpress email >
+
+DB_NAME: "wordpress database name"
+
+DB_USER: "wordpress database username"
+
+APACHE_USER: "apache user other than www-data"
+
+APACHE_GROUP: "apache group other than www-data"
+
+WP_ADMIN: "wordpress admin user"
+
+WP_PASSWORD: "worpress admin password"
+
+WP_TITLE: "wordpress blog title"
+
+WP_EMAIL: "wordpress email"
 
 
 Dependencies
 ------------
-Ansible >= 2.16
-Supported OS:
-  Ubuntu 22.04 (Jammy)
+* Ansible >= 2.16
+* Supported OS:
+  * Ubuntu 22.04 (Jammy)
 
 
 Example Playbook
 ----------------
+```
 ---
 - name: wordpress
   hosts: 
   - servers
   roles:
   - gloom39.wordpress
-
+```
 License
 -------
-
 BSD
 
 Author Information
