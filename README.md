@@ -52,6 +52,17 @@ Example Playbook
   - servers
   roles:
   - gloom39.wordpress
+  vars:
+    DB_PASSWORD: wordpress123
+    MYSQL_SOCKET_PATH: /var/run/mysqld/mysqld.sock
+    DB_NAME: wordpress
+    DB_USER: wordpress
+    APACHE_USER: wordpress
+    APACHE_GROUP: wordpress
+    WP_ADMIN: admin
+    WP_PASSWORD: wordpress123
+    WP_TITLE: my site
+    WP_EMAIL: admin@example.com
 ```
 License
 -------
