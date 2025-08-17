@@ -1,0 +1,150 @@
+---
+# tasks file for wordpress
+- name: Install mysql server
+  apt:
+    name: mysql-server
+    update_cache: yes
+    state: present
+  tags:
+  - install_mysql
+
+- name: Install PyMySql
+  apt:
+    name: python3-pymysql
+    update_cache: yes
+    state: present
+
+- name: Install sendmail
+  apt:
+    name: sendmail
+    update_cache: yes
+    state: present
+
+- name: Restart mysql server
+  service:
+    name: mysql
+    state: restarted
+
+- name: Create wordpress database
+  mysql_db:
+    name: "{{ DB_NAME }}"
+    state: present
+    login_unix_socket: "{{ MYSQL_SOCKET_PATH }}"
+
+- name: Create wordpress user
+  mysql_user:
+    name: "{{ DB_USER }}"
+    password: "{{ DB_PASSWORD }}"
+    state: present
+    priv: 
+     'wordpress.*': 'ALL' 
+    login_unix_socket: "{{ MYSQL_SOCKET_PATH }}"
+
+
+- name: Install apache2
+  apt:
+    name: apache2
+    update_cache: yes
+    state: present
+
+- name: Add php repository
+  apt_repository:
+    repo: ppa:ondrej/php
+    state: present
+
+- name: Install php
+  apt:
+    name: php8.1
+    update_cache: yes
+    state: present
+  tags:
+  - install_php
+
+- name: Install php8.1 modules
+  tags:
+  - install_modules
+  apt:
+    name: "php8.1-{{ item }}" 
+    update_cache: yes
+    state: present
+  with_items:
+  - cli
+  - curl
+  - dom
+  - zip 
+  - exif
+  - fileinfo
+  - igbinary
+  - imagick
+  - mbstring
+  - intl 
+  - zip 
+  - mysql
+
+- name: Create apache user
+  user:
+    name: "{{ APACHE_USER }}"
+    create_home: yes
+
+- name: Create www directory
+  file:
+    state: directory
+    mode: 0777
+    path: "/home/{{ APACHE_USER }}/www"
+    owner: "{{ APACHE_USER }}"
+    group: "{{ APACHE_GROUP }}"
+      
+- name: Setup wordpress
+  shell: |
+    cd /home/{{ APACHE_USER }}/www && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && php wp-cli.phar core download --allow-root && php wp-cli.phar core config --dbhost=localhost --dbname={{ DB_NAME }} --dbuser={{ DB_USER }} --dbpass={{ DB_PASSWORD }} --allow-root
+
+- name: Install wordpress
+  shell: |
+    cd /home/{{ APACHE_USER }}/www && \
+    php wp-cli.phar core install \
+      --url={{ ansible_default_ipv4.address }} \
+      --title="{{ WP_TITLE }}" \
+      --admin_name={{ WP_ADMIN }} \
+      --admin_password="{{ WP_PASSWORD }}" \
+      --admin_email="{{ WP_EMAIL }}" \
+      --allow-root
+
+- name: Change file permission
+  file:
+    path: "/home/{{ APACHE_USER }}/www"
+    owner: "{{ APACHE_USER }}"
+    group: "{{ APACHE_GROUP }}"
+    recurse: yes
+
+
+- name: Copy apache config
+  template:
+    src: apache2_conf.j2 
+    dest: /etc/apache2/apache2.conf
+    trim_blocks: true
+
+- name: Copy wordpress config
+  template:
+    src: wordpress_conf.j2
+    dest: /etc/apache2/sites-enabled/wordpress.conf
+    trim_blocks: true
+
+- name: Copy apache envvars
+  template:
+    src: envvars.j2
+    dest: /etc/apache2/envvars
+
+- name: Enable rewrite module
+  shell: |
+    sudo a2enmod rewrite
+
+- name: Restart apache2 service
+  service:
+    name: apache2
+    state: restarted  
+    
+
+
+
+
+
