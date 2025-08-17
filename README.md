@@ -9,6 +9,7 @@ Requirements
 1. Make sure port 80 and 3306 is not used by other process or service. Apache and Mysql needs to use port 80 and 3306
 2. Apache service is run by different user other than www-data which is defined in the variable. The user will be created. 
 
+
 Role Variables
 --------------
 DB_PASSWORD: "wordpress database password"
@@ -38,6 +39,9 @@ Dependencies
 * Supported OS:
   * Ubuntu 22.04 (Jammy)
 
+```bash
+ansible-galaxy collection install community.mysql
+```
 
 Example Playbook
 ----------------
